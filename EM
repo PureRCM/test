@@ -1,0 +1,1985 @@
+
+<!doctype html>
+<html lang="en">
+
+    <head>
+    
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="Calculate the evaluation and management (E/M) code based on components." />
+        <meta name="Distribution" content="Global" />
+        <title>E/M Component Calculator - Evaluation and Management Coding</title>
+
+   
+        <meta property="og:title" content="E/M Component Calculator - Evaluation and Management Coding" />
+        <meta property="og:description" content="Calculate the evaluation and management (E/M) code based on components." />
+        
+
+
+        <link rel="shortcut icon" href="/static/images/favicon.png" type="image/x-icon" />
+
+
+<!-- styles -->
+<link
+  href="/static/v4/bootstrap/4.3.1/css/bootstrap.min.css?cachebust=20210610"
+  rel="stylesheet"
+>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+  rel="stylesheet"
+>
+
+<link
+  href="/static/v4/npm/flatpickr/dist/flatpickr.min.css"
+  rel="stylesheet"
+>
+
+<link type="text/css" href="/static/jquery/jquery-ui-1.12.1/jquery-ui.min.css" rel="stylesheet" />
+
+<link
+  href="/includes/v4/_site-min.css?cachebust=20230728"
+  rel="stylesheet"
+>
+
+
+<!-- javascript -->
+<script src="/static/jquery/jquery-3.4.1.min.js"></script>
+
+<script defer src="/static/v4/popper/1.14.7/umd/popper.min.js"></script>
+
+<script defer src="/static/v4/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script defer src="/static/v4/jquery/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+<script defer src="/static/v4/fontawesome/local.js"></script>
+
+
+
+<script src="/static/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+    <link href="styles.css" rel="stylesheet"/>
+    <script src="em-chart.js"></script>
+    <style>div.page { page-break-after: always !important; } </style>
+    
+        <link href="/includes/v4/_site_overrides-min.css" rel="stylesheet">
+            </head>
+
+
+    <body>
+
+
+
+        <main role="main" class="container main-fixed"><div class="container"></div><h1>E/M Code Calculator - by Components</h1><br /><div>
+<div id="calculatorDiv">
+
+<input type="hidden" name="hpi_score" id="hpi_score" value="" /><input type="hidden" name="ros_score" id="ros_score" value="" /><input type="hidden" name="pfsh_score" id="pfsh_score" value="" /><input type="hidden" name="history_score" id="history_score" value="" /><input type="hidden" name="exam_score" id="exam_score" value="" /><input type="hidden" name="dxtx_score" id="dxtx_score" value="" /><input type="hidden" name="data_review_score" id="data_review_score" value="" /><input type="hidden" name="risk_score" id="risk_score" value="" /><input type="hidden" name="mdm_score" id="mdm_score" value="" /><input type="hidden" name="component_level" id="component_level" value="" /><input type="hidden" name="component_code" id="component_code" value="" /><input type="hidden" name="component_status" id="component_status" value="" /><input type="hidden" name="component_over_under" id="component_over_under" value="" /><input type="hidden" name="component_results_text" id="component_results_text" value="" /><input type="hidden" name="component_results" id="component_results" value="" />
+<p id="chartTitle" style="display:none; margin-top:0px; padding-top:0px; font-size:14pt;"></p>
+<p id="chartNotes" style="border-bottom:1px solid black; display:none; margin-top:7px; padding-top:0px; padding-bottom: 3px; font-size:11pt;"></p>
+<p id="printLevelOfService" style="display:none; float:right;">Level of Service:&nbsp; <big><span id="printLoSCode"></span></big></p>
+
+<p style="margin-top:20px;">
+  Type&nbsp;of&nbsp;Encounter&nbsp; 
+  <input type="hidden" name="encounter_type" id="encounter_type" value="office_new" />
+  <select name="encounter_type_picker" id="encounter_type_picker" class="form-control" style="display:inline;width:auto;">
+    <option value="office_new" selected>Office, New Patient</option>
+    <option value="office_est" >Office, Established Patient</option>
+    <option value="hospital_new" >Hospital, Initial</option>
+    <option value="hospital_sub" >Hospital, Subsequent</option>
+    <option value="consult" >Consultation</option>
+  </select>
+</p>
+
+
+<table class="edit-table">
+
+<tr>
+  <th><span style="font-size:1.2rem;">History</span></th>
+  <td>&nbsp;</td>
+</tr>
+
+<tr>  <!-- HPI -->
+  <th><big>HPI</big></th>
+  <td>
+    <p>History of Present Illness - Characterize HPI by considering <b>EITHER</b> the status of 3 chronic or inactive conditions <b>OR</b> the number of elements recorded.</p>
+    <div style="margin-bottom:5px;">
+      <label><input type="radio" name="hpi_type" id="hpi_type_none" value="none" /> No HPI</label>
+    </div>
+    <div style="margin-bottom:5px;">
+      <label><input type="radio" name="hpi_type" id="hpi_type_chronic" value="chronic" /> 3 Chronic or Inactive Conditions</label>
+    </div>
+    <div>
+      <label><input type="radio" name="hpi_type" id="hpi_type_elements" value="elements" /> Elements</label>
+      <div id="hpi_elements_div" style="display:none;margin-left:25px;padding-top:3px;">
+        Check all elements that are represented in the documentation:
+  <label><input type="checkbox" name="hpi_location" id="hpi_location" class="hpi-group" /> Location&nbsp; <small>Is pain diffuse or localized? Im-lateral or bilateral? Fixed or migratory? Radiating or referred?</small></label>  <label><input type="checkbox" name="hpi_duration" id="hpi_duration" class="hpi-group" /> Duration&nbsp; <small>How long have symptoms been present?</small></label>  <label><input type="checkbox" name="hpi_timing" id="hpi_timing" class="hpi-group" /> Timing&nbsp; <small>Is it nocturnal, diurnal or continuous? Is there a repetitive pattern?</small></label>  <label><input type="checkbox" name="hpi_quality" id="hpi_quality" class="hpi-group" /> Quality&nbsp; <small>Is pain sharp, dull, throbbing, stabbing, constant or intermittent, acute or chronic, stable, improving or worsening?</small></label>  <label><input type="checkbox" name="hpi_severity" id="hpi_severity" class="hpi-group" /> Severity&nbsp; <small>1-10, with 1 being no pain and 10 being the worst pain experienced.</small></label>  <label><input type="checkbox" name="hpi_context" id="hpi_context" class="hpi-group" /> Context&nbsp; <small>What was pt doing when symptoms or signs began? What factors were present before / after?</small></label>  <label><input type="checkbox" name="hpi_modifying_factors" id="hpi_modifying_factors" class="hpi-group" /> Modifying Factors&nbsp; <small>What does pt do for relief? What makes symptom(s) worse? What meds have been taken? What were results?</small></label>  <label><input type="checkbox" name="hpi_assoc_signs" id="hpi_assoc_signs" class="hpi-group" /> Associated Signs &amp; Symptoms&nbsp; <small>Additional sensations or feelings.</small></label>      </div>
+    </div>
+    <p id="hpi_result" style="font-size:14pt;">Result: N/A</p>
+  </td>
+</tr>
+
+<tr>  <!-- ROS -->
+  <th><big>ROS</big></th>
+  <td>
+    <p>Review of Systems - Check all systems that are represented in the documentation:</p>
+    <table style="margin-left:0px;"><tr><td style="width:50%;padding-right:20px;border:0px;padding-left:0px;">
+  <label><input type="checkbox" name="ros_constitutional" id="ros_constitutional" class="ros-group" /> Constitutional&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_allergy" id="ros_allergy" class="ros-group" /> Allergy/Immunology&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_gastro" id="ros_gastro" class="ros-group" /> Gastrointestinal&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_skin" id="ros_skin" class="ros-group" /> Integumentary (Skin)&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_eyes" id="ros_eyes" class="ros-group" /> Eyes&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_genitourinary" id="ros_genitourinary" class="ros-group" /> Genitourinary&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_enmt" id="ros_enmt" class="ros-group" /> Ears, Nose, Mouth, Throat&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_hema" id="ros_hema" class="ros-group" /> Hematologic/Lymphatic&nbsp; <small></small></label></td><td style="width:50%;padding-left:20px;border:0px;">  <label><input type="checkbox" name="ros_resp" id="ros_resp" class="ros-group" /> Respiratory&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_endo" id="ros_endo" class="ros-group" /> Endocrine&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_neuro" id="ros_neuro" class="ros-group" /> Neurologic&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_musculo" id="ros_musculo" class="ros-group" /> Musculoskeletal&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_cardio" id="ros_cardio" class="ros-group" /> Cardiovascular&nbsp; <small></small></label>  <label><input type="checkbox" name="ros_psych" id="ros_psych" class="ros-group" /> Psychiatric &nbsp; <small></small></label>  <label><input type="checkbox" name="ros_all_other_negative" id="ros_all_other_negative" class="ros-group" /> All other systems were negative&nbsp; <small></small></label>    </td></tr></table>
+    <p id="ros_result" style="font-size:14pt;">Result: N/A</p>
+  </td>
+</tr>
+
+<tr>
+  <th><big>PFSH</big></th>
+  <td>
+    <p>Past, Family, and Social History</p>
+  <label><input type="checkbox" name="pfsh_past" id="pfsh_past" class="pfsh-group" /> Past history&nbsp; <small>The patient's past experiences with illnesses, hospitalizations, operations, injuries, treatments, medications, immunizations, allergies, feeding issues, etc. where related to current CC, HPI, ROS.</small></label>  <label><input type="checkbox" name="pfsh_family" id="pfsh_family" class="pfsh-group" /> Family history&nbsp; <small>A review of medical events in the patient's family, including diseases that may be hereditary or place the patient at risk; genetic conditions, health status/deaths of parents, siblings, etc. where related to current CC, HPI, ROS.</small></label>  <label><input type="checkbox" name="pfsh_social" id="pfsh_social" class="pfsh-group" /> Social history&nbsp; <small>An age appropriate review of past and current activities; marital status, tobacco/alcohol/drug use, employment, military status, legal issues, sexual history, living arrangements, etc. where related to current CC, HPI, ROS.</small></label>    <p id="pfsh_result" style="font-size:14pt;">Result: N/A</p>
+  </td>
+</tr>
+
+<tr style="page-break-after:always">
+  <th><span style="font-size:1.2rem;">History Result</span></th>
+  <td style="padding-top:7px;padding-bottom:30px;">
+    <span id="history_result" style="font-size:14px;font-weight:bold;"></span><br />
+    The result is based on the lowest level of service performed:
+    <table id="history_grid_office_new" class="history-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>History Component</th>
+      <th id="office_new_1">Problem Focused (PF)</th>
+      <th id="office_new_2">Expanded (EPF)</th>
+      <th id="office_new_3">Detailed (D)</th>
+      <th id="office_new_4">Comprehensive (C)</th>
+    </tr>
+    <tr>
+      <th>HPI</th>
+      <td id="office_new_hpi_1">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="office_new_hpi_2">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="office_new_hpi_3">Extended<br /><small>(4+ elements)</small></td>
+      <td id="office_new_hpi_4">Extended<br /><small>(4+ elements)</small></td>
+    </tr>
+    <tr>
+      <th>ROS</th>
+      <td id="office_new_ros_1">N/A</td>
+      <td id="office_new_ros_2">Problem Pertinent<br /><small>(1 system)</small></td>
+      <td id="office_new_ros_3">Extended<br /><small>(2-9 systems)</small></td>
+      <td id="office_new_ros_4">Complete<br /><small>(10+ systems)</small></td>
+    </tr>
+    <tr>
+      <th>PFSH</th>
+      <td id="office_new_pfsh_1">N/A</td>
+      <td id="office_new_pfsh_2">N/A</td>
+      <td id="office_new_pfsh_3">Pertinent<br /><small>(1-2 areas)</small></td>
+      <td id="office_new_pfsh_4">Complete<br /><small>(3 areas)</small></td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="office_new_level_1">99201</td>
+      <th id="office_new_level_2">99202</td>
+      <th id="office_new_level_3">99203</td>
+      <th id="office_new_level_4">99204/99205</td>
+    </tr>
+    </table>
+
+    <table id="history_grid_office_est" class="history-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>History Component</th>
+      <th id="office_est_1">Problem Focused (PF)</th>
+      <th id="office_est_2">Expanded (EPF)</th>
+      <th id="office_est_3">Detailed (D)</th>
+      <th id="office_est_4">Comprehensive (C)</th>
+    </tr>
+    <tr>
+      <th>HPI</th>
+      <td id="office_est_hpi_1">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="office_est_hpi_2">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="office_est_hpi_3">Extended<br /><small>(4+ elements)</small></td>
+      <td id="office_est_hpi_4">Extended<br /><small>(4+ elements)</small></td>
+    </tr>
+    <tr>
+      <th>ROS</th>
+      <td id="office_est_ros_1">N/A</td>
+      <td id="office_est_ros_2">Problem Pertinent<br /><small>(1 system)</small></td>
+      <td id="office_est_ros_3">Extended<br /><small>(2-9 systems)</small></td>
+      <td id="office_est_ros_4">Complete<br /><small>(10+ systems)</small></td>
+    </tr>
+    <tr>
+      <th>PFSH</th>
+      <td id="office_est_pfsh_1">N/A</td>
+      <td id="office_est_pfsh_2">N/A</td>
+      <td id="office_est_pfsh_3">Pertinent<br /><small>(1 area)</small></td>
+      <td id="office_est_pfsh_4">Complete<br /><small>(2-3 areas)</small></td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="office_est_level_1">99212</td>
+      <th id="office_est_level_2">99213</td>
+      <th id="office_est_level_3">99214</td>
+      <th id="office_est_level_4">99215</td>
+    </tr>
+    </table>
+
+    <table id="history_grid_hospital_new" class="history-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>History Component</th>
+      <th id="hospital_new_1">Problem Focused (PF)</th>
+      <th id="hospital_new_2">Expanded (EPF)</th>
+      <th id="hospital_new_3">Detailed (D)</th>
+      <th id="hospital_new_4">Comprehensive (C)</th>
+    </tr>
+    <tr>
+      <th>HPI</th>
+      <td id="hospital_new_hpi_1">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="hospital_new_hpi_2">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="hospital_new_hpi_3">Extended<br /><small>(4+ elements)</small></td>
+      <td id="hospital_new_hpi_4">Extended<br /><small>(4+ elements)</small></td>
+    </tr>
+    <tr>
+      <th>ROS</th>
+      <td id="hospital_new_ros_1">N/A</td>
+      <td id="hospital_new_ros_2">Problem Pertinent<br /><small>(1 system)</small></td>
+      <td id="hospital_new_ros_3">Extended<br /><small>(2-9 systems)</small></td>
+      <td id="hospital_new_ros_4">Complete<br /><small>(10+ systems)</small></td>
+    </tr>
+    <tr>
+      <th>PFSH</th>
+      <td id="hospital_new_pfsh_1">N/A</td>
+      <td id="hospital_new_pfsh_2">N/A</td>
+      <td id="hospital_new_pfsh_3">Pertinent<br /><small>(1-2 areas)</small></td>
+      <td id="hospital_new_pfsh_4">Complete<br /><small>(3 areas)</small></td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="hospital_new_level_1">N/A</td>
+      <th id="hospital_new_level_2">N/A</td>
+      <th id="hospital_new_level_3">99221</td>
+      <th id="hospital_new_level_4">99222/99223</td>
+    </tr>
+    </table>
+
+    <table id="history_grid_hospital_sub" class="history-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>History Component</th>
+      <th id="hospital_sub_1">Problem Focused (PF)</th>
+      <th id="hospital_sub_2">Expanded (EPF)</th>
+      <th id="hospital_sub_3">Detailed (D)</th>
+      <th id="hospital_sub_4">Comprehensive (C)</th>
+    </tr>
+    <tr>
+      <th>HPI</th>
+      <td id="hospital_sub_hpi_1">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="hospital_sub_hpi_2">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="hospital_sub_hpi_3">Extended<br /><small>(4+ elements)</small></td>
+      <td id="hospital_sub_hpi_4">Extended<br /><small>(4+ elements)</small></td>
+    </tr>
+    <tr>
+      <th>ROS</th>
+      <td id="hospital_sub_ros_1">N/A</td>
+      <td id="hospital_sub_ros_2">Problem Pertinent<br /><small>(1 system)</small></td>
+      <td id="hospital_sub_ros_3">Extended<br /><small>(2-9 systems)</small></td>
+      <td id="hospital_sub_ros_4">Complete<br /><small>(10+ systems)</small></td>
+    </tr>
+    <tr>
+      <th>PFSH</th>
+      <td id="hospital_sub_pfsh_1">N/A</td>
+      <td id="hospital_sub_pfsh_2">N/A</td>
+      <td id="hospital_sub_pfsh_3">Pertinent<br /><small>(1 area)</small></td>
+      <td id="hospital_sub_pfsh_4">Complete<br /><small>(2-3 areas)</small></td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="hospital_sub_level_1">99231</td>
+      <th id="hospital_sub_level_2">99232</td>
+      <th id="hospital_sub_level_3">99233</td>
+      <th id="hospital_sub_level_4">99233</td>
+    </tr>
+    </table>
+
+    <table id="history_grid_consult" class="history-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>History Component</th>
+      <th id="consult_1">Problem Focused (PF)</th>
+      <th id="consult_2">Expanded (EPF)</th>
+      <th id="consult_3">Detailed (D)</th>
+      <th id="consult_4">Comprehensive (C)</th>
+    </tr>
+    <tr>
+      <th>HPI</th>
+      <td id="consult_hpi_1">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="consult_hpi_2">Brief<br /><small>(1-3 elements)</small></td>
+      <td id="consult_hpi_3">Extended<br /><small>(4+ elements)</small></td>
+      <td id="consult_hpi_4">Extended<br /><small>(4+ elements)</small></td>
+    </tr>
+    <tr>
+      <th>ROS</th>
+      <td id="consult_ros_1">N/A</td>
+      <td id="consult_ros_2">Problem Pertinent<br /><small>(1 system)</small></td>
+      <td id="consult_ros_3">Extended<br /><small>(2-9 systems)</small></td>
+      <td id="consult_ros_4">Complete<br /><small>(10+ systems)</small></td>
+    </tr>
+    <tr>
+      <th>PFSH</th>
+      <td id="consult_pfsh_1">N/A</td>
+      <td id="consult_pfsh_2">N/A</td>
+      <td id="consult_pfsh_3">Pertinent<br /><small>(1-2 area)</small></td>
+      <td id="consult_pfsh_4">Complete<br /><small>(3 areas)</small></td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="consult_level_1">99241</td>
+      <th id="consult_level_2">99242</td>
+      <th id="consult_level_3">99243</td>
+      <th id="consult_level_4">99244/99245</td>
+    </tr>
+    </table>
+    
+  </td>
+</tr>
+
+<tr>  <!-- Examination -->
+  <th><div class="page"><span style="font-size:1.2rem;">Examination</span></div></th>
+  <td>&nbsp;</td>
+</tr>
+
+<tr>
+  <th>&nbsp;</th>
+  <td style="padding-bottom:30px;">
+  
+    <div id="examCalculatorTitle" class="no-print" style="background-color:#f3f1f5;padding:7px 15px;margin-top:7px;cursor:pointer;" onclick="$('#examCalcDiv').show();">Calculate number of body areas, organ systems, or bullet points... (click here)</div>
+    <div style="display:none;border:1px solid #f3f1f5;padding:5px 10px;" id="examCalcDiv">
+    
+      <script>
+	function showSOSExam()
+	{
+		$('#examCalcDiv').show();
+		var header = $('#accordion').find('.sos_accordion_header');
+		header.click();
+		document.querySelector('#examination_header').scrollIntoView({ behavior: 'smooth' });
+	}
+	</script>
+	
+	<div id="accordion">
+		<h3>95 Guidelines</h3>
+		<div>
+			<div style="background-color:#f3f1f5;padding:5px 10px;margin-top:7px;">Body Areas</div>
+			<div style="border:1px solid #f3f1f5;padding:5px 10px;">
+				<table style="margin-left:10px;"><tr>
+				<td style="width:50%;border-top:0px;">
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baHead" /> Head, including the face</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baNeck" /> Neck</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baChest" /> Chest, including breasts and axillae</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baAbdomen" /> Abdomen</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baGenitalia" /> Genitalia, groin, buttocks</label>
+				</td>
+				<td style="width:50%;padding-left:80px;border-top:0px;">
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baBack" /> Back, including spine</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baRightUp" /> Right upper extremity</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baLeftUp" /> Left upper extremity</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baRightLow" /> Right lower extremity</label>
+				<label class="exam-label"><input type="checkbox" class="e95ba" id="e95baLeftLow" /> Left lower extremity</label>
+				</td>
+				</tr></table>
+				<label class="exam-label2"><input type="checkbox" class="e95baD" id="e95baDetail" /> <b>Affected system was examined in detail</b></label>
+			</div>
+		
+			<div style="background-color:#f3f1f5;padding:5px 10px;margin-top:7px;">Organ Systems</div>
+			<div style="border:1px solid #f3f1f5;padding:5px 10px;">
+				<table style="margin-left:10px;"><tr>
+				<td style="width:50%;border-top:0px;">
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osHead" /> Constitutional <small>(e.g., vital signs, general appearance)</small></label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osNeck" /> Eyes</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osChest" /> Ears, nose, mouth and throat</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osAbdomen" /> Cardiovascular</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osGenitalia" /> Respiratory</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osGenitalia" /> Gastrointestinal</label>
+				</td>
+				<td style="width:50%;padding-left:20px;border-top:0px;">
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osBack" /> Genitourinary</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osRightUp" /> Musculoskeletal</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osLeftUp" /> Skin</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osRightLow" /> Neurologic</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osLeftLow" /> Psychiatric</label>
+				<label class="exam-label"><input type="checkbox" class="e95os" id="e95osLeftLow" /> Hematologic/lymphatic/immunologic</label>
+				</td>
+				</tr></table>
+				<label class="exam-label2"><input type="checkbox" class="e95osD" id="e95osDetail" /> <b>Affected system was examined in detail</b></label>
+			</div>
+		</div>
+		<h3>97 Guidelines - General Multi-system exam</h3>
+		<div>	
+			<p><b>Constitutional</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97con" /> Three vital signs</label>
+			<label class="exam-label2"><input type="checkbox" class="e97con" /> General appearance</label>
+	
+			<p><b>Eyes</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97eye" /> Inspection of conjunctivae and lids</label>
+			<label class="exam-label2"><input type="checkbox" class="e97eye" /> Examination of pupils and irises (PERRLA)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97eye" /> Ophthalmoscopic discs and posterior segments</label>
+	
+			<p><b>Ears, Nose, Mouth, and Throat </b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> External appearance of the ears and nose (overall appearance, scars, lesions, masses) </label>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> Otoscopic examination of the external auditory canals and tympanic membranes</label>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> Assessment of hearing</label>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> Inspection of nasal mucosa, septum and turbinates</label>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> Inspection of lips, teeth and gums</label>
+			<label class="exam-label2"><input type="checkbox" class="e97ent" /> Examination of oropharynx: oral mucosa, salivary glands, hard and soft palates, tongue, tonsils and posterior pharynx</label>
+	
+			<p><b>Neck</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97neck" /> Examination of neck (e.g., masses, overall appearance, symmetry, tracheal position, crepitus)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97neck" /> Examination of thyroid</label>
+	
+			<p><b>Respiratory</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97resp" /> Assessment of respiratory effort (e.g., intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97resp" /> Percussion of chest (e.g., dullness, flatness, hyperresonance)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97resp" /> Palpation of chest (e.g., tactile fremitus)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97resp" /> Auscultation of the lungs</label>
+	
+			<p><b>Cardiovascular</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Palpation of the heart (location, size, thrills)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Auscultation of the heart with notation of abnormal sounds and murmurs</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Assessment of lower extremities for edema and/or varicosities</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Examination of the carotid arteries (e.g., pulse amplitude, bruits)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Examination of abdominal aorta (e.g., size, bruits)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Examination of the femoral arteries (e.g., pulse amplitude, bruits)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97card" /> Examination of the pedal pulses (e.g., pulse amplitude)</label>
+	
+			<p><b>Chest (Breasts)</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97chest" /> Inspection of the breasts (e.g., symmetry, nipple discharge)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97chest" /> Palpation of the breasts and axillae (e.g., masses, lumps, tenderness)</label>
+	
+			<p><b>Gastrointestinal (Abdomen)</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97gastro" /> Examination of the abdomen with notation of presence of masses or tenderness</label>
+			<label class="exam-label2"><input type="checkbox" class="e97gastro" /> Examination of the liver and spleen</label>
+			<label class="exam-label2"><input type="checkbox" class="e97gastro" /> Examination for the presence or absence of hernias</label>
+			<label class="exam-label2"><input type="checkbox" class="e97gastro" /> Examination (when indicated) of anus, perineum, and rectum, including sphincter tone, presence of hemorrhoids, rectal masses</label>
+			<label class="exam-label2"><input type="checkbox" class="e97gastro" /> Obtain stool for occult blood testing when indicated</label>
+	
+			<p><b>Genitourinary (Male)</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the scrotal contents (e.g., hydrocoele, spermatocoele, tenderness of cord, testicular mass)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the penis</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Digital rectal examination of the prostate gland (e.g., size, symmetry, nodularity, tenderness)</label>
+	
+			<p><b>Genitourinary (Female)</b></p>
+	
+			<p style="margin-left:17px;">Pelvic examination (with or without specimen collection for smears and cultures, which may include: </p>
+	
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the external genitalia (e.g., general appearance, hair distribution, lesions)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the urethra (e.g., masses, tenderness, scarring)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the bladder (e.g., fullness, masses, tenderness)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the cervix (e.g., general appearance, discharge, lesions)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the uterus (e.g., size, contour, position, mobility, tenderness, consistency, descent or support)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97geni" /> Examination of the adnexa/parametria (e.g., masses, tenderness, organomegaly, nodularity)</label>
+	
+			<p><b>Lymphatic</b></p>
+			<p style="margin-left:17px;">Palpation of lymph nodes - <b>two or more areas</b>: </p>
+			<label class="exam-label2"><input type="checkbox" class="e97lymph" /> Neck</label>
+			<label class="exam-label2"><input type="checkbox" class="e97lymph" /> Axillae</label>
+			<label class="exam-label2"><input type="checkbox" class="e97lymph" /> Groin</label>
+			<label class="exam-label2"><input type="checkbox" class="e97lymph" /> Other</label>
+	
+			<p><b>Musculoskeletal</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97muscu" /> Examination of gait and station</label>
+			<label class="exam-label2"><input type="checkbox" class="e97muscu" /> Inspection and/or palpation of digits and nails (e.g., clubbing, cyanosis, inflammatory conditions, petechiae, ischemia, infections, nodes)</label>
+			<p style="margin-left:17px;">Examination of the joints, bones, and muscles of one or more of the following six areas:</p>
+			<table>
+			<tr>
+			<th>Area</th>
+			<th style="width:100px;text-align:center;">a. Inspect/Palp</th>
+			<th style="width:100px;text-align:center;">b. ROM</th>
+			<th style="width:100px;text-align:center;">c. Stability</th>
+			<th style="width:100px;text-align:center;">d. Strength/Tone</th>
+			</tr>
+			<tr>
+			<th>Head and neck</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			<tr>
+			<th>Spine, ribs, and pelvis</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			<tr>
+			<th>Right upper extremity</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			<tr>
+			<th>Left upper extremity</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			<tr>
+			<th>Right lower extremity</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			<tr>
+			<th>Left lower extremity</th>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			<td style="text-align:center;"><label> <input type="checkbox" class="e97muscu" />&nbsp; </label>
+			</tr>
+			</table>
+			<p style="margin-left:17px;">The examination of a given area may include:</p>
+			<ol style="list-style-type: lower-alpha;">
+			<li>Inspection and/or palpation with notation of presence of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</li>
+			<li>Assessment of range of motion with notation of any pain, crepitation or contracture</li>
+			<li>Assessment of stability with notation of any dislocation, subluxation, or laxity</li>
+			<li>Assessment of muscle strength and tone (e.g., flaccid, cogwheel, spastic) with notation of any  atrophy or abnormal movements</li>
+			</ol>
+	
+			<p><b>Skin</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97skin" /> Inspection of skin and subcutaneous tissue (e.g., rashes, lesions, ulcers)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97skin" /> Palpation of the skin and subcutaneous tissue (e.g., induration, subcutaneous nodules, tightening)</label>
+	
+			<p><b>Neurologic</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97neuro" /> Test cranial nerves with notation of any deficits</label>
+			<label class="exam-label2"><input type="checkbox" class="e97neuro" /> Examination of DTRs with notation of any pathologic reflexes (e.g., Babinksi)</label>
+			<label class="exam-label2"><input type="checkbox" class="e97neuro" /> Examination of sensation (e.g., by touch, pin, vibration, proprioception)</label>
+	
+			<p><b>Psychiatric</b></p>
+			<label class="exam-label2"><input type="checkbox" class="e97psych" /> Description of patient’s judgment and insight</label>
+			<label class="exam-label2"><input type="checkbox" class="e97psych" /> Brief assessment of mental status which may include:</label>
+			<ol style="list-style-type: lower-alpha;">
+			<li>orientation to time, place, and person</li>
+			<li>recent and remote memory</li>
+			<li>mood and affect</li>
+			</ol>
+		</div>
+		<h3 class="sos_accordion_header">97 Guidelines - Single Organ Systems Exam</h3>
+		<div>
+			<script>
+	function check_uncheck_all(that)
+	{
+		var activity = $(that).html();
+		if(activity == 'check all')
+		{
+			$(that).parent().find('input[type="checkbox"]').prop('checked', true);
+			$(that).html('uncheck all');
+		}
+		else
+		{
+			$(that).parent().find('input[type="checkbox"]').prop('checked', false);
+			$(that).html('check all');
+		}
+		chart.gradeSOSExam();
+	}
+</script>
+
+<div id="sos_exams_container">
+
+<label>Please select a specialty examination:
+	<select id="sel_sos">
+		<option value="car">Cardiovascular</option>
+		<option value="ear">Ear, Nose and Throat</option>
+		<option value="eye">Eye</option>
+		<option value="gen">Genitourinary</option>
+		<option value="hem">Hematologic/Lymphatic/Immunologic</option>
+		<option value="mus">Musculoskeletal</option>
+		<option value="neu">Neurological</option>
+		<option value="psy">Psychiatric</option>
+		<option value="res">Respiratory</option>
+		<option value="ski">Skin</option>
+	</select>
+</label>
+
+<h4><span class="sos_header">SOS</span> Examination</h4>
+
+<div id="sos_car_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff) </label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities,attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_eyes" /> Inspection of conjunctivae and lids (eg, xanthelasma)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_ears" /> Inspection of teeth, gums and palate</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_ears" /> Inspection of oral mucosa with notation of presence of pallor or cyanosis</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_neck" /> Examination of jugular veins (eg, distension; a, v or cannon a waves)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Respiratory</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_resp" /> Assessment of respiratory effort (eg, intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_resp" /> Auscultation of lungs (eg, breath sounds, adventitious sounds, rubs)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Palpation of heart (eg, location, size and forcefulness of the point of maximal impact; thrills; lifts; palpable S3 or S4)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Auscultation of heart including sounds, abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Measurement of blood pressure in two or more extremities when indicated (eg, aortic
+dissection, coarctation)</label>
+		<p>Examination of:</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Carotid arteries (eg, waveform, pulse amplitude, bruits, apical-carotid delay)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Abdominal aorta (eg, size, bruits)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Femoral arteries (eg, pulse amplitude, bruits)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Pedal pulses (eg, pulse amplitude)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_card" /> Extremities for peripheral edema and/or varicosities</label>
+
+	</div>
+	<div class="sos_shaded">
+		<h5>Gastrointestinal (Abdomen)</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_gastr" /> Examination of abdomen with notation of presence of masses or tenderness</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_gastr" /> Examination of liver and spleen</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_gastr" /> Obtain stool sample for occult blood from patients who are being considered for thrombolytic or anticoagulant therapy</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_musc" /> Examination of the back with notation of kyphosis or scoliosis</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_musc" /> Examination of gait with notation of ability to undergo exercise testing and/or participation in exercise programs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy and abnormal movements</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_extre" /> Inspection and palpation of digits and nails (eg, clubbing, cyanosis, inflammation, petechiae, ischemia, infections, Osler’s nodes)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_skin" /> Inspection and/or palpation of skin and subcutaneous tissue (eg, stasis dermatitis, ulcers, scars, xanthomas)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_car_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+
+<div id="sos_ear_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities,attention to grooming)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_const" /> Assessment of ability to communicate (eg, use of sign language or other communication aids) and quality of voice</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Head and Face</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_head" /> Inspection of head and face (eg, overall appearance, scars, lesions and masses)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_head" /> Palpation and/or percussion of face with notation of presence or absence of sinus tenderness</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_head" /> Examination of salivary glands</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_head" /> Assessment of facial strength</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_eyes" />  Test ocular motility including primary gaze alignment</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Otoscopic examination of external auditory canals and tympanic membranes including Mouth pneumo-otoscopy with notation of mobility of membranes</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Assessment of hearing with tuning forks and clinical speech reception thresholds (eg, whispered voice, finger rub)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> External inspection of ears and nose (eg, overall appearance, scars, lesions and masses)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Inspection of nasal mucosa, septum and turbinates</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Inspection of lips, teeth and gums</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Examination of oropharynx: oral mucosa, hard and soft palates, tongue, tonsils and posterior pharynx (eg, asymmetry, lesions, hydration of mucosal surfaces)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Inspection of pharyngeal walls and pyriform sinuses (eg, pooling of saliva, asymmetry, lesions)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Examination by mirror of larynx including the condition of the epiglottis, false vocal cords, true vocal cords and mobility of larynx (Use of mirror not required in children)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_ears" /> Examination by mirror of nasopharynx including appearance of the mucosa, adenoids, posterior choanae and eustachian tubes (Use of mirror not required in children)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_neck" /> Examination of neck (eg, masses, overall appearance, symmetry, tracheal position, crepitus)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_resp" /> Inspection of chest including symmetry, expansion and/or assessment of respiratory effort (eg, intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_resp" /> Auscultation of lungs (eg, breath sounds, adventitious sounds, rubs)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_card" /> Auscultation of heart with notation of abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_lymph" /> Palpation of lymph nodes in neck, axillae, groin and/or other location</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_neuro" /> Test cranial nerves with notation of any deficits</label>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ear_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+<div id="sos_eye_container" class="sos_container">	
+	<div class="sos_unshaded">
+		<h5>Constitutional</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Test visual acuity (Does not include determination of refractive error)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Gross visual field testing by confrontation</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Test ocular motility including primary gaze alignment</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Inspection of bulbar and palpebral conjunctivae</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Examination of ocular adnexae including lids (eg, ptosis or lagophthalmos), lacrimal glands, lacrimal drainage, orbits and preauricular lymph nodes</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Examination of pupils and irises including shape, direct and consensual reaction (afferent pupil), size (eg, anisocoria) and morphology</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Slit lamp examination of the corneas including epithelium, stroma, endothelium, and tear film</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Slit lamp examination of the anterior chambers including depth, cells, and flare</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Slit lamp examination of the lenses including clarity, anterior and posterior capsule, cortex, and nucleus</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Measurement of intraocular pressures (except in children and patients with trauma or infectious disease)</label>
+		
+		<p>Ophthalmoscopic examination through dilated pupils (unless contraindicated) of</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Optic discs including size, C/D ratio, appearance (eg, atrophy, cupping, tumor elevation) and nerve fiber layer</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_eyes" /> Posterior segments including retina and vessels (eg, exudates and hemorrhages)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_eye_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+<div id="sos_gen_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_neck" /> Examination of neck (eg, masses, overall appearance, symmetry, tracheal position, crepitus)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_resp" /> Assessment of respiratory effort (eg, intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_resp" /> Auscultation of lungs (eg, breath sounds, adventitious sounds, rubs)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_card" /> Auscultation of heart with notation of abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+		<p>[See genitourinary (female)]<p>
+	</div>
+	<div class="sos_shaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_gastr" /> Examination of abdomen with notation of presence of masses or tenderness</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_gastr" /> Examination for presence or absence of hernia</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_gastr" /> Examination of liver and spleen</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_gastr" /> Obtain stool sample for occult blood test when indicated</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Genitourinary</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label">Select Male or Female: 
+			<select id="sos_gen_gender">
+				<option value="male">Male</option>
+				<option value="female">Female</option>
+			</select>
+		</label>
+		<div id="sos_gen_male">
+			<h4>Male</h4>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Inspection of anus and perineum</label>
+			<p>Examination (with or without specimen collection for smears and cultures) of genitalia including:</p>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Scrotum (eg, lesions, cysts, rashes)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Epididymides (eg, size, symmetry, masses)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Testes (eg, size, symmetry, masses)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Urethral meatus (eg, size, location, lesions, discharge)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Penis (eg, lesions, presence or absence of foreskin, foreskin retractability, plaque, masses,
+scarring, deformities)</label>
+			<p>Digital rectal examination including:</p>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Prostate gland (eg, size, symmetry, nodularity, tenderness)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Seminal vesicles (eg, symmetry, tenderness, masses, enlargement)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Sphincter tone, presence of hemorrhoids, rectal masses</label>
+		</div>
+		<div id="sos_gen_female">
+			<h4>Female</h4>
+			<p>Includes at least seven of the following eleven elements identified by:</p>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Inspection and palpation of breasts (eg, masses or lumps, tenderness, symmetry, nipple discharge)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Digital rectal examination including sphincter tone, presence of hemorrhoids, rectal masses</label>
+
+			<p>Pelvic examination (with or without specimen collection for smears and cultures) including:</p>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> External genitalia (eg, general appearance, hair distribution, lesions)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Urethral meatus (eg, size, location, lesions, prolapse)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Urethra (eg, masses, tenderness, scarring)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Bladder (eg, fullness, masses, tenderness)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Vagina (eg, general appearance, estrogen effect, discharge, lesions, pelvic support, cystocele, rectocele)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Cervix (eg, general appearance, lesions, discharge)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Uterus (eg, size, contour, position, mobility, tenderness, consistency, descent or support)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Adnexa/parametria (eg, masses, tenderness, organomegaly, nodularity)</label>
+			<label class="exam_sos_label"><input type="checkbox" class="esos_gen_genit" /> Anus and perineum</label>
+		</div>
+		
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_lymph" /> Palpation of lymph nodes in neck, axillae, groin and/or other location</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_skin" /> Inspection and/or palpation of skin and subcutaneous tissue (eg, rashes, lesions, ulcers)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_neuro" /> Orientation (eg, time, place and person) and</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_gen_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+<div id="sos_hem_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_head" /> Palpation and/or percussion of face with notation of presence or absence of sinus tenderness</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_eyes" /> Inspection of conjunctivae and lids</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_ears" /> Otoscopic examination of external auditory canals and tympanic membranes</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_ears" /> Inspection of nasal mucosa, septum and turbinates</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_ears" /> Inspection of teeth and gums</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_ears" /> Examination of oropharynx (eg, oral mucosa, hard and soft palates, tongue, tonsils, posterior
+pharynx)</label>
+
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_neck" /> Examination of neck (eg, masses, overall appearance, symmetry, tracheal position, crepitus)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Respiratory</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_resp" /> Assessment of respiratory effort (eg, intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_resp" /> Auscultation of lungs (eg, breath sounds, adventitious sounds, rubs)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_card" /> Auscultation of heart with notation of abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_gastr" /> Examination of abdomen with notation of presence of masses or tenderness</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_gastr" /> Examination of liver and spleen</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_lymph" /> Palpation of lymph nodes in neck, axillae, groin, and/or other location</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_extre" /> Inspection and palpation of digits and nails (eg, clubbing, cyanosis, inflammation, petechiae, ischemia, infections, nodes)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_skin" /> Inspection and/or palpation of skin and subcutaneous tissue (eg, rashes, lesions, ulcers, ecchymoses, bruises)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_hem_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+<div id="sos_mus_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff) </label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_lymph" /> Palpation of lymph nodes in neck, axillae, groin and/or other location</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Musculoskeletal</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Examination of gait and station</label>
+		<p>Examination of joint(s), bone(s) and muscle(s)/ tendon(s) of four of the following six areas: 1)
+head and neck; 2) spine, ribs and pelvis; 3) right upper extremity; 4) left upper extremity;
+5) right lower extremity; and 6) left lower extremity. The examination of a given area includes:</p>
+		
+		<p>Head and Neck</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>
+		
+		<p>Spine, ribs and pelvis</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>
+		
+		<p>Right upper extremity</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>
+		
+		<p>Left upper extremity</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>
+		
+		<p>Right lower extremity</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>
+		
+		<p>Left lower extremity</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Inspection, percussion and/or palpation with notation of any misalignment, asymmetry, crepitation, defects, tenderness, masses or effusions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of range of motion with notation of any pain (eg, straight leg raising), crepitation or contracture</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of stability with notation of any dislocation (luxation), subluxation or laxity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements</label>	
+	</div>
+	<div class="sos_shaded">
+		<h5>Extremities</h5>
+		<p>[See musculoskeletal and skin]</p>
+	</div>
+	<div class="sos_shaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Inspection and/or palpation of skin and subcutaneous tissue (eg, scars, rashes, lesions, cafeau-lait spots, ulcers) in four of the following six areas:</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Head and neck</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Trunk</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Right upper extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Left upper extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Right lower extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_skin" /> Left lower extremity</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_neuro" /> Test coordination (eg, finger/nose, heel/ knee/shin, rapid alternating movements in the upper and lower extremities, evaluation of fine motor coordination in young children)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_neuro" /> Examination of deep tendon reflexes and/or nerve stretch test with notation of pathological reflexes (eg, Babinski)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_neuro" /> Examination of sensation (eg, by touch, pin, vibration, proprioception)</label>
+		
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_mus_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+<div id="sos_neu_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_eyes" /> Ophthalmoscopic examination of optic discs (eg, size, C/D ratio, appearance) and posterior segments (eg, vessel changes, exudates, hemorrhages)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_card" /> Examination of carotid arteries (eg, pulse amplitude, bruits)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_card" /> Auscultation of heart with notation of abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Musculoskeletal</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_musc" /> Examination of gait and station</label>
+		
+		<p>Assessment of motor function including:</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_musc" /> Muscle strength in upper and lower extremities</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_musc" /> Muscle tone in upper and lower extremities (eg, flaccid, cog wheel, spastic) with notation of any atrophy or abnormal movements (eg, fasciculation, tardive dyskinesia)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+		<p>[See musculoskeletal]</p>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Neurological</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Evaluation of higher integrative functions including:</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Recent and remote memory</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Attention span and concentration</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Language (eg, naming objects, repeating phrases, spontaneous speech)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Fund of knowledge (eg, awareness of current events, past history, vocabulary)</label>
+		
+		<p>Test the following cranial nerves:</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 2nd cranial nerve (eg, visual acuity, visual fields, fundi)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 3rd, 4th and 6th cranial nerves (eg, pupils, eye movements)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 5th cranial nerve (eg, facial sensation, corneal reflexes)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 7th cranial nerve (eg, facial symmetry, strength)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 8th cranial nerve (eg, hearing with tuning fork, whispered voice and/or finger rub)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 9th cranial nerve (eg, spontaneous or reflex palate movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 11th cranial nerve (eg, shoulder shrug strength)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> 12th cranial nerve (eg, tongue protrusion)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Examination of sensation (eg, by touch, pin, vibration, proprioception)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Examination of deep tendon reflexes in upper and lower extremities with notation of pathological reflexes (eg, Babinski)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_neu_neuro" /> Test coordination (eg, finger/nose, heel/knee/shin, rapid alternating movements in the upper and lower extremities, evaluation of fine motor coordination in young children)</label>
+	</div>
+</div>
+
+<div id="sos_psy_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary (Abdomen)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy and abnormal movements</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_musc" /> Examination of gait and station</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Description of speech including: rate; volume; articulation; coherence; and spontaneity with notation of abnormalities (eg, perseveration, paucity of language)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Description of thought processes including: rate of thoughts; content of thoughts (eg, logical vs. illogical, tangential); abstract reasoning; and computation </label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Description of associations (eg, loose, tangential, circumstantial, intact)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Description of abnormal or psychotic thoughts including: hallucinations; delusions; preoccupation with violence; homicidal or suicidal ideation; and obsessions</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Description of the patient’s judgment (eg, concerning everyday activities and social situations) and insight (eg, concerning psychiatric condition)</label>
+		
+		<p>Complete mental status examination including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Recent and remote memory</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Attention span and concentration</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Language (eg, naming objects, repeating phrases)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Fund of knowledge (eg, awareness of current events, past history, vocabulary)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_psy_neuro" /> Mood and affect (eg, depression, anxiety, agitation, hypomania, lability)</label>
+	</div>
+</div>
+
+<div id="sos_res_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_ears" /> Inspection of nasal mucosa, septum and turbinates</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_ears" /> Inspection of teeth and gums</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_ears" /> Examination of oropharynx (eg, oral mucosa, hard and soft palate, tongue, tonsils and posterior pharynx)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_neck" /> Examination of neck (eg, masses, overall appearance, symmetry, tracheal position, crepitus)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_neck" /> Examination of jugular veins (eg, distention, a, v or cannon a waves)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Respiratory</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_resp" /> Inspection of chest with notation of symmetry and expansion</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_resp" /> Assessment of respiratory effort (eg, intercostal retractions, use of accessory muscles, diaphragmatic movement)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_resp" /> Percussion of chest (eg, dullness, flatness, hyperresonance)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_resp" /> Palpation of chest (eg, tactile fremitus)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_resp" /> Auscultation of lungs (eg, breath sounds, adventitious sounds, rubs)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_card" /> Auscultation of heart with notation of abnormal sounds and murmurs</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_shaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_gastr" /> Examination of abdomen with notation of presence of masses or tenderness</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_gastr" /> Examination of liver and spleen</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_lymph" /> Palpation of lymph nodes in neck, axillae, groin and/or other location</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_musc" /> Assessment of muscle strength and tone (eg, flaccid, cog wheel, spastic) with notation of any atrophy and abnormal movements</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_musc" /> Examination of gait and station</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_extre" /> Inspection and palpation of digits and nails (eg, clubbing, cyanosis, inflammation, petechiae, ischemia, infections, nodes)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_skin" /> Inspection and/or palpation of skin and subcutaneous tissue (eg, rashes, lesions, ulcers)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including </p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_res_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+
+
+<div id="sos_ski_container" class="sos_container">	
+	<div class="sos_shaded">
+		<h5>Constitutional</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_const" /> Measurement of any three of the following seven vital signs: 1) sitting or standing blood pressure, 2) supine blood pressure, 3) pulse rate and regularity, 4) respiration, 5) temperature, 6) height, 7) weight (May be measured and recorded by ancillary staff)</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_const" /> General appearance of patient (eg, development, nutrition, body habitus, deformities, attention to grooming)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Head and Face</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Eyes</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_eyes" /> Inspection of conjunctivae and lids</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Ears, Nose, Mouth and Throat</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_ears" /> Inspection of teeth and gums </label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_ears" /> Examination of oropharynx (eg, oral mucosa, hard and soft palates, tongue, tonsils, posterior pharynx)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neck</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_neck" /> Examination of thyroid (eg, enlargement, tenderness, mass)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Respiratory</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Cardiovascular</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_card" /> Examination of peripheral vascular system by observation (eg, swelling, varicosities) and palpation (eg, pulses, temperature, edema, tenderness)</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Chest (Breasts)</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Gastrointenstinal (Abdomen)</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_gastr" /> Examination of liver and spleen</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_gastr" /> Examination of anus for condyloma and other lesions</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Genitourinary</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Lymphatic</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_lymph" /> Palpation of lymph nodes in neck, axillae, groin and/or other location</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Musculoskeletal</h5>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Extremities</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_extre" /> Inspection and palpation of digits and nails (eg, clubbing, cyanosis, inflammation, petechiae, ischemia, infections, nodes)</label>
+	</div>
+	<div class="sos_shaded">
+		<h5>Skin</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Palpation of scalp and inspection of hair of scalp, eyebrows, face, chest, pubic area (when indicated) and extremities</label>
+		<p></p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Head, including the face and</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Neck</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Chest, including breasts and axillae</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Abdomen</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Genitalia, groin, buttocks</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Back</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Right upper extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Left upper extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Right lower extremity</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Left upper extremity</label>
+		
+		<p>NOTE: For the comprehensive level, the examination of at least eight anatomic
+areas must be performed and documented. For the three lower levels of
+examination, each body area is counted separately. For example, inspection
+and/or palpation of the skin and subcutaneous tissue of the right upper extremity
+and the left upper extremity constitutes two elements.</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_skin" /> Inspection of eccrine and apocrine glands of skin and subcutaneous tissue with identification and location of any hyperhidrosis, chromhidroses or bromhidrosis</label>
+	</div>
+	<div class="sos_unshaded">
+		<h5>Neurological/Psychiatric</h5>
+		<a onClick="check_uncheck_all(this);" class="sos_check_all" >check all</a>
+		<p>Brief assessment of mental status including</p>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_neuro" /> Orientation to time, place and person</label>
+		<label class="exam_sos_label"><input type="checkbox" class="esos_ski_neuro" /> Mood and affect (eg, depression, anxiety, agitation)</label>
+	</div>
+</div>
+<br>
+<!-- label id="sos_document_label"><input type="checkbox" id="sos_document_checkbox" /> I have documented every element in each box with a shaded border and at least one element in each box with an unshaded border.</label -->
+
+</div>		</div>
+	</div> <!-- end exam accordion -->
+
+      <div style="background-color:#f3f1f5;padding:5px 10px;margin-top:7px;">Results</div>
+      <div style="border:1px solid #f3f1f5;padding:5px 10px;">
+         <p>
+			<b>95 Guidelines - Body Areas:&nbsp; <big><span id="examCalcBA">0</span></big> &nbsp;-&nbsp; Organ Systems:&nbsp; <big><span id="examCalcOS">0</span></big></b>
+			<br>
+			<b>97 Guidelines - General Multi-system - Bullets:&nbsp; <big><span id="examCalc97Bullets">0</span></big> &nbsp;-&nbsp; Organ Systems:&nbsp; <big><span id="examCalc97OS">0</span></big></b>
+			<br>
+			<b>97 Guidelines - <span class="sos_header">SOS</span> - Bullets:&nbsp; <big><span id="examCalcSOS">0</span></big></b>
+		</p>
+	  </div>
+
+      <button type="button" class="css_button" style="margin-top:15px;" onclick="$('#examCalcDiv').hide();">Close Exam Calculator</button>
+      
+    </div>
+    
+    <p>Select the exam level.&nbsp; Select for both 95 and 97 Guidelines.&nbsp; Or use the calculator above.</p>
+    <table id="examGrid" class="exam-table">
+    <tr style="background-color:#f3f1f5;">
+      <th>Type of Exam</th>
+      <th>95 Guidelines</th>
+      <th>97 Guidelines - General Multi-system</th>
+	  <th id="sos_results_header" onClick="showSOSExam()">97 Guidelines - <span class="sos_header">SOS</span></th>
+      <th>Level</th>
+    </tr>
+    <tr>
+      <td id="exam_type_level_0" style="font-style:italic;">None</td>
+      <td id="exam95_cell_0"><label><input type="radio" name="exam95" id="exam95_0" class="exam-group" value="0" /> N/A </label></td>
+      <td id="exam97_cell_0"><label><input type="radio" name="exam97" id="exam97_0" class="exam-group" value="0" /> N/A </label></td>
+      <td id="exam97sos_cell_0"><label><input type="radio" name="exam97sos" id="exam97sos_0" class="exam-group" value="0"  checked="checked" /> N/A </label></td>
+	  <th id="exam_cell_level_0">N/A</th>
+    </tr>
+    <tr>
+      <td id="exam_type_level_1" style="font-style:italic;">Problem Focused (PF)</td>
+      <td id="exam95_cell_1"><label><input type="radio" name="exam95" id="exam95_1" class="exam-group" value="1" /> 1 Body Area or Organ System</label></td>
+      <td id="exam97_cell_1"><label><input type="radio" name="exam97" id="exam97_1" class="exam-group" value="1" /> 1-5 bulleted elements</label></td>
+      <td id="exam97sos_cell_1"><label><input type="radio" name="exam97sos" id="exam97sos_1" class="exam-group" value="1" /><span id="sos_result_1"> 1-5 bulleted elements</span></label></td>
+	  <th id="exam_cell_level_1"><span id="exam_level_1"></span></th>
+    </tr>
+    <tr>
+      <td id="exam_type_level_2" style="font-style:italic;">Expanded Problem Focused (EPF)</td>
+      <td id="exam95_cell_2"><label><input type="radio" name="exam95" id="exam95_2" class="exam-group" value="2" /> 2-7 Body Areas or Organ Systems (or 4x4)</label></td>
+      <td id="exam97_cell_2"><label><input type="radio" name="exam97" id="exam97_2" class="exam-group" value="2" /> 6-11 bulleted elements</label></td>
+      <td id="exam97sos_cell_2"><label><input type="radio" name="exam97sos" id="exam97sos_2" class="exam-group" value="2" /><span id="sos_result_2"> 6-11 bulleted elements</span></label></td>
+      <th id="exam_cell_level_2"><span id="exam_level_2"></span></th>
+    </tr>
+    <tr>
+      <td id="exam_type_level_3" style="font-style:italic;">Detailed (D)</td>
+      <td id="exam95_cell_3"><label><input type="radio" name="exam95" id="exam95_3" class="exam-group" value="3" /> 2-7 Body Areas or Organ Systems with affected system in detail</label></td>
+      <td id="exam97_cell_3"><label><input type="radio" name="exam97" id="exam97_3" class="exam-group" value="3" /> 12-17 bulleted elements for 2+ systems</label></td>
+      <td id="exam97sos_cell_3"><label><input type="radio" name="exam97sos" id="exam97sos_3" class="exam-group" value="3" /><span id="sos_result_3"> 12-17 bulleted elements for 2+ systems</span></label></td>
+      <th id="exam_cell_level_3"><span id="exam_level_3"></span></th>
+    </tr>
+    <tr>
+      <td id="exam_type_level_4" style="font-style:italic;">Comprehensive (C)</td>
+      <td id="exam95_cell_4"><label><input type="radio" name="exam95" id="exam95_4" class="exam-group" value="4" /> 8 Body Areas or Organ Systems</label></td>
+      <td id="exam97_cell_4"><label><input type="radio" name="exam97" id="exam97_4" class="exam-group" value="4" /> 18+ bulleted elements for 9+ systems <small>(see requirements for individual single system exams)</small></label></td>
+      <td id="exam97sos_cell_4"><label><input type="radio" name="exam97sos" id="exam97sos_4" class="exam-group" value="4" /><span id="sos_result_4"> All bulleted elements</span></label></td>
+      <th id="exam_cell_level_4"><span id="exam_level_4"></span></th>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <th colspan="2" style="text-align:left;"><span style="font-size:1.2rem;">Medical Decision Making (MDM)</span></th>
+</tr>
+
+<tr>  <!-- Number of Diagnosis or Treatment Options -->
+  <th><big>Number of Diagnosis or Treatment Options</big></th>
+  <td>
+    <table id="dxtxTable">
+    <tr style="background-color: #f3f1f5;">
+      <th style="text-align:left;">Problem(s) Status</th>
+      <th>Number</th>
+      <th>*</th>
+      <th>Points</th>
+      <th>=</th>
+      <th>Result</th>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Self-limited or minor (stable, improved, or worsening)</td>
+      <td><input type="number" name="dxtx_1" id="dxtx_1" class="dxtx-group" style="width:35px;" min="0" max="2" value="0" /><br /><small>(max 2)</small></td>
+      <td>*</td>
+      <td><big>1</big></td>
+      <td>=</td>
+      <td><big><span id="dxdx_1_result">0</span></big></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Established problem (to examiner) (stable, improved)</td>
+      <td><input type="number" name="dxtx_2" id="dxtx_2" class="dxtx-group" style="width:35px;" min="0" max="5" value="0" /></td>
+      <td>*</td>
+      <td><big>1</big></td>
+      <td>=</td>
+      <td><big><span id="dxdx_2_result">0</span></big></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Established problem (to examiner) (worsening)</td>
+      <td><input type="number" name="dxtx_3" id="dxtx_3" class="dxtx-group" style="width:35px;" min="0" max="5" value="0" /></td>
+      <td>*</td>
+      <td><big>2</big></td>
+      <td>=</td>
+      <td><big><span id="dxdx_3_result">0</span></big></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">New problem (to examiner); requiring no additional workup to assess a diagnosis</td>
+      <td><input type="number" name="dxtx_4" id="dxtx_4" class="dxtx-group" style="width:35px;" min="0" max="1" value="0" /><br /><small>(max 1)</small></td>
+      <td>*</td>
+      <td><big>3</big></td>
+      <td>=</td>
+      <td><big><span id="dxdx_4_result">0</span></big></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">New problem (to examiner); requiring additional workup to assess a diagnosis</td>
+      <td><input type="number" name="dxtx_5" id="dxtx_5" class="dxtx-group" style="width:35px;" min="0" max="5" value="0" /></td>
+      <td>*</td>
+      <td><big>4</big></td>
+      <td>=</td>
+      <td><big><span id="dxdx_5_result">0</span></big></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="text-align:right;">Result:&nbsp; <span id="dxtxResult" style="font-size:14px;font-weight:bold;">N/A</span></td>
+      <td><span id="dxtxCalc" style="font-size:14px;font-weight:bold;">0</span></td>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>  <!-- Amount and/or Complexity of Data Reviewed -->
+  <th><big>Amount and/or Complexity of Data Reviewed</big></th>
+  <td>
+    <table id="dataReviewedTable">
+    <tr style="background-color: #f3f1f5;">
+      <th style="text-align:left;">Reviewed Data</th>
+      <th>&nbsp;</th>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Review and/or order of clinical lab tests</td>
+      <td style="width:70px;"><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_1" id="dataReviewed_1" class="data-reviewed-group" />&nbsp;1&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Review and/or order tests in the radiology section of CPT<small><sup>&reg;</sup></small></td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_2" id="dataReviewed_2" class="data-reviewed-group" />&nbsp;1&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Review and/or order tests in the medicine section of CPT<small><sup>&reg;</sup></small></td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_3" id="dataReviewed_3" class="data-reviewed-group" />&nbsp;1&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Discussion of test results with performing physician</td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_4" id="dataReviewed_4" class="data-reviewed-group" />&nbsp;1&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Decision to obtain old records and/or obtain history from someone other than patient</td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_5" id="dataReviewed_5" class="data-reviewed-group" />&nbsp;1&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Review and summarization of old records and/or obtaining history from someone other than patient and/or discussion of case with another health care provider</td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_6" id="dataReviewed_6" class="data-reviewed-group" />&nbsp;2&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Independent visualization of image, tracing or specimen itself (not simply review of report)</td>
+      <td><label style="line-height: 17px;">&nbsp;&nbsp;<input type="checkbox" name="dataReviewed_7" id="dataReviewed_7" class="data-reviewed-group" />&nbsp;2&nbsp;</label></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;">Result:&nbsp; <span id="dataReviewResult" style="font-size:14px;font-weight:bold;">Minimal</span></td>
+      <td><span id="dataReviewCalc" style="font-size:14px;font-weight:bold;">0</span></td>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>  <!-- Risk of Complications and/or Morbidity or Mortality -->
+  <th><big>Risk of Complications and/or Morbidity or Mortality</big></th>
+  <td>
+    <table id="riskTable">
+    <tr style="background-color: #f3f1f5;">
+      <th style="width:10%;">Level</th>
+      <th style="width:30%;">Presenting Problem(s)</th>
+      <th style="width:30%;">Diagnostic Procedure(s) Ordered</th>
+      <th style="width:30%;">Management Options</th>
+    </tr>
+    <tr>
+      <th id="riskMin">Minimal</th>
+      <td>
+        <label><input type="checkbox" name="riskMin_1_1" id="riskMin_1_1" class="risk-group" /> One self-limited or minor problem, e.g., cold, insect bite, Tinea Corporis</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskMin_2_1" id="riskMin_2_1" class="risk-group" /> Lab tests requiring venipuncture</label>
+        <label><input type="checkbox" name="riskMin_2_2" id="riskMin_2_2" class="risk-group" /> Chest x-rays</label>
+        <label><input type="checkbox" name="riskMin_2_3" id="riskMin_2_3" class="risk-group" /> EKG/EEG</label>
+        <label><input type="checkbox" name="riskMin_2_4" id="riskMin_2_4" class="risk-group" /> Urinalysis</label>
+        <label><input type="checkbox" name="riskMin_2_5" id="riskMin_2_5" class="risk-group" /> Ultrasound, e.g., echo</label>
+        <label><input type="checkbox" name="riskMin_2_6" id="riskMin_2_6" class="risk-group" /> KOH prep</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskMin_3_1" id="riskMin_3_1" class="risk-group" /> Rest</label>
+        <label><input type="checkbox" name="riskMin_3_2" id="riskMin_3_2" class="risk-group" /> Gargles</label>
+        <label><input type="checkbox" name="riskMin_3_3" id="riskMin_3_3" class="risk-group" /> Elastic bandages</label>
+        <label><input type="checkbox" name="riskMin_3_4" id="riskMin_3_4" class="risk-group" /> Superficial dressings</label>
+      </td>
+    </tr>
+    <tr>
+      <th id="riskLow">Low</th>
+      <td>
+        <label><input type="checkbox" name="riskLow_1_1" id="riskLow_1_1" class="risk-group" /> Two or more self-limited or minor problems</label>
+        <label><input type="checkbox" name="riskLow_1_2" id="riskLow_1_2" class="risk-group" /> One stable chronic illness, e.g., well-controlled hypertension or non-insulin dependent diabetes, cataract BPH</label>
+        <label><input type="checkbox" name="riskLow_1_3" id="riskLow_1_3" class="risk-group" /> Acute uncomplicated illness or injury, e.g., cystitis, allergic rhinitis, simple sprain</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskLow_2_1" id="riskLow_2_1" class="risk-group" /> Physiologic tests not under stress, e.g., pulmonary function tests</label>
+        <label><input type="checkbox" name="riskLow_2_2" id="riskLow_2_2" class="risk-group" /> Non-cardiovascular imaging studies with contrast, e.g., barium enema</label>
+        <label><input type="checkbox" name="riskLow_2_3" id="riskLow_2_3" class="risk-group" /> Superficial needle, biopsies</label>
+        <label><input type="checkbox" name="riskLow_2_4" id="riskLow_2_4" class="risk-group" /> Clinical laboratory tests requiring arterial puncture</label>
+        <label><input type="checkbox" name="riskLow_2_5" id="riskLow_2_5" class="risk-group" /> Skin biopsies</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskLow_3_1" id="riskLow_3_1" class="risk-group" /> Over-the-counter drugs</label>
+        <label><input type="checkbox" name="riskLow_3_2" id="riskLow_3_2" class="risk-group" /> Minor surgery with no identified risk factors</label>
+        <label><input type="checkbox" name="riskLow_3_3" id="riskLow_3_3" class="risk-group" /> Physical therapy</label>
+        <label><input type="checkbox" name="riskLow_3_4" id="riskLow_3_4" class="risk-group" /> Occupational therapy</label>
+        <label><input type="checkbox" name="riskLow_3_5" id="riskLow_3_5" class="risk-group" /> IV fluids</label>
+      </td>
+    </tr>
+    <tr>
+      <th id="riskMod">Moderate</th>
+      <td>
+        <label><input type="checkbox" name="riskMod_1_1" id="riskMod_1_1" class="risk-group" /> One or more chronic illnesses with mild exacerbation, progression, or side effects of treatment</label>
+        <label><input type="checkbox" name="riskMod_1_2" id="riskMod_1_2" class="risk-group" /> Two or more stable chronic illnesses</label>
+        <label><input type="checkbox" name="riskMod_1_3" id="riskMod_1_3" class="risk-group" /> Undiagnosed new problem with uncertain prognosis, e.g., lump in breast</label>
+        <label><input type="checkbox" name="riskMod_1_4" id="riskMod_1_4" class="risk-group" /> Acute illness with systematic symptoms, e.g., pyelonephritis</label>
+        <label><input type="checkbox" name="riskMod_1_5" id="riskMod_1_5" class="risk-group" /> Acute complicated injury, e.g., head injury with brief loss of consciousness</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskMod_2_1" id="riskMod_2_1" class="risk-group" /> Physiologic tests not under stress, e.g., cardiac stress test, fetal contraction stress test</label>
+        <label><input type="checkbox" name="riskMod_2_2" id="riskMod_2_2" class="risk-group" /> Diagnostic endoscopes with no identified factors</label>
+        <label><input type="checkbox" name="riskMod_2_3" id="riskMod_2_3" class="risk-group" /> Deep needle or incisional biopsy</label>
+        <label><input type="checkbox" name="riskMod_2_4" id="riskMod_2_4" class="risk-group" /> Cardiovascular imaging studies with contrast and no identified reisk factors, e.g., arteriogram cardiac cath</label>
+        <label><input type="checkbox" name="riskMod_2_5" id="riskMod_2_5" class="risk-group" /> Obtain fluid from body cavity, e.g., lumbar puncture, thoracentesis, culdecentisis</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskMod_3_1" id="riskMod_3_1" class="risk-group" /> Minor surgery with identified risk factors</label>
+        <label><input type="checkbox" name="riskMod_3_2" id="riskMod_3_2" class="risk-group" /> Major surgery (open, percutaneous or endoscopic) with no identified risk factors</label>
+        <label><input type="checkbox" name="riskMod_3_3" id="riskMod_3_3" class="risk-group" /> Prescription drug management</label>
+        <label><input type="checkbox" name="riskMod_3_4" id="riskMod_3_4" class="risk-group" /> Therapeutic nuclear medicine</label>
+        <label><input type="checkbox" name="riskMod_3_5" id="riskMod_3_5" class="risk-group" /> IV fluids with additives</label>
+        <label><input type="checkbox" name="riskMod_3_6" id="riskMod_3_6" class="risk-group" /> Closed treatment of fracture or dislocation without manipulation</label>
+      </td>
+    </tr>
+    <tr>
+      <th id="riskHigh">High</th>
+      <td>
+        <label><input type="checkbox" name="riskHigh_1_1" id="riskHigh_1_1" class="risk-group" /> One or more chronic illnesses with severe exacerbation, progression, or side effects of treatment</label>
+        <label><input type="checkbox" name="riskHigh_1_2" id="riskHigh_1_2" class="risk-group" /> Acute or chronic illnesses or injuries that may pose a threat to life or bodily function, e.g., multiple trauma, acute MI, pulmonary embolus, severe respiratory distress, progressive severe rheumatoid arthritis, psychiatric illness with potential threat to self or others, peritonitis, acute renal failure</label>
+        <label><input type="checkbox" name="riskHigh_1_3" id="riskHigh_1_3" class="risk-group" /> An abrupt change in neurologic status, e.g., seizure, TIA, weakness or sensory loss</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskHigh_2_1" id="riskHigh_2_1" class="risk-group" /> Cardiovascular imaging studies with contrast with identified risk factors</label>
+        <label><input type="checkbox" name="riskHigh_2_2" id="riskHigh_2_2" class="risk-group" /> Cardiac electrophysiological tests</label>
+        <label><input type="checkbox" name="riskHigh_2_3" id="riskHigh_2_3" class="risk-group" /> Diagnostic endoscopies with identified risk factors</label>
+        <label><input type="checkbox" name="riskHigh_2_4" id="riskHigh_2_4" class="risk-group" /> Discography</label>
+      </td>
+      <td>
+        <label><input type="checkbox" name="riskHigh_3_1" id="riskHigh_3_1" class="risk-group" /> Major surgery (open, percutaneous or endoscopic) with identified risk factors</label>
+        <label><input type="checkbox" name="riskHigh_3_2" id="riskHigh_3_2" class="risk-group" /> Emergency major surgery (open, percutaneious or endoscopic)</label>
+        <label><input type="checkbox" name="riskHigh_3_3" id="riskHigh_3_3" class="risk-group" /> Parenternal controlled substances</label>
+        <label><input type="checkbox" name="riskHigh_3_4" id="riskHigh_3_4" class="risk-group" /> Drug therapy requiring intensive monitoring for toxicity</label>
+        <label><input type="checkbox" name="riskHigh_3_5" id="riskHigh_3_5" class="risk-group" /> Decision not to resuscitate or de-escalate care because of poor prognosis</label>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4" style="text-align:left;">Result:&nbsp; <span id="riskResult" style="font-size:14px;font-weight:bold;">N/A</span></td>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>  <!-- Medical Decision Making Results -->
+  <th><span style="font-size:1.2rem;">MDM Result</span></th>
+  <td style="padding-top:7px;padding-bottom:30px;">
+    <table id="mdmGrid">
+    <tr><td colspan="5" >MDM Complexity is based on the 2nd lowest of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;"># of Dx/Tx options</td>
+      <td id="mdmDxTx_1">Minimal (1)</td>
+      <td id="mdmDxTx_2">Limited (2)</td>
+      <td id="mdmDxTx_3">Multiple (3)</td>
+      <td id="mdmDxTx_4">Extensive (4)</td>
+    </tr>
+    <tr>
+      <td style="font-style:italic;">Amount &amp; complexity of data</td>
+      <td id="mdmData_1">Minimal (0-1)</td>
+      <td id="mdmData_2">Limited (2)</td>
+      <td id="mdmData_3">Multiple (3)</td>
+      <td id="mdmData_4">Extensive (4)</td>
+    </tr>
+    <tr>
+      <td style="font-style:italic;">Risk</td>
+      <td id="mdmRisk_1">Minimal</td>
+      <td id="mdmRisk_2">Low</td>
+      <td id="mdmRisk_3">Moderate</td>
+      <td id="mdmRisk_4">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>MDM Complexity</th>
+      <th id="mdm_1">Straight&nbsp;Forward</th>
+      <th id="mdm_2">Low</th>
+      <th id="mdm_3">Moderate</th>
+      <th id="mdm_4">High</th>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <th colspan="2" style="text-align:left;"><span style="font-size:1.2rem;">Level&nbsp;of&nbsp;Service</span></th>
+</tr>
+<tr>  <!-- Overall Component Results -->
+  <th>&nbsp;</th>
+  <td style="padding-top:7px;">
+    <table id="overall_grid_office_new" class="overall-table">
+    <tr><td colspan="6">Level of Service is based on the lowest of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;">History</td>
+      <td id="office_new_history_1">Problem Focused (PF)</td>
+      <td id="office_new_history_2">Expanded (EPF)</td>
+      <td id="office_new_history_3">Detailed (D)</td>
+      <td id="office_new_history_4">Comprehensive (C)</td>
+      <td id="office_new_history_5">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">Examination</td>
+      <td id="office_new_exam_1">Problem Focused (PF)</td>
+      <td id="office_new_exam_2">Expanded (EPF)</td>
+      <td id="office_new_exam_3">Detailed (D)</td>
+      <td id="office_new_exam_4">Comprehensive (C)</td>
+      <td id="office_new_exam_5">Comprehensive (C)</td>
+    </tr>
+    <tr>
+      <td style="font-style:italic;">MDM Complexity</td>
+      <td id="office_new_mdm_1">Straight Forward</td>
+      <td id="office_new_mdm_2">Straight Forward</td>
+      <td id="office_new_mdm_3">Low</td>
+      <td id="office_new_mdm_4">Moderate</td>
+      <td id="office_new_mdm_5">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="office_new_overall_1">99201<br />Level I</th>
+      <th id="office_new_overall_2">99202<br />Level II</th>
+      <th id="office_new_overall_3">99203<br />Level III</th>
+      <th id="office_new_overall_4">99204<br />Level IV</th>
+      <th id="office_new_overall_5">99205<br />Level V</th>
+    </tr>
+    </table>
+
+    <table id="overall_grid_office_est" class="overall-table">
+    <tr><td colspan="5">Level of Service is based on the middle of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;">History</td>
+      <td id="office_est_history_1">Problem Focused (PF)</td>
+      <td id="office_est_history_2">Expanded (EPF)</td>
+      <td id="office_est_history_3">Detailed (D)</td>
+      <td id="office_est_history_4">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">Examination</td>
+      <td id="office_est_exam_1">Problem Focused (PF)</td>
+      <td id="office_est_exam_2">Expanded (EPF)</td>
+      <td id="office_est_exam_3">Detailed (D)</td>
+      <td id="office_est_exam_4">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">MDM Complexity</td>
+      <td id="office_est_mdm_1">Straight Forward</td>
+      <td id="office_est_mdm_2">Low</td>
+      <td id="office_est_mdm_3">Moderate</td>
+      <td id="office_est_mdm_4">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="office_est_overall_1">99212<br />Level II</th>
+      <th id="office_est_overall_2">99213<br />Level III</th>
+      <th id="office_est_overall_3">99214<br />Level IV</th>
+      <th id="office_est_overall_4">99215<br />Level V</th>
+    </tr>
+    <tr><td colspan="5"><i>Note: Level I is used when the patient sees the nurse, not the doctor.</i></td></tr>
+    </table>
+
+    <table id="overall_grid_hospital_new" class="overall-table">
+    <tr><td colspan="5">Level of Service is based on the lowest of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;">History</td>
+      <td id="hospital_new_history_1">Detailed (D)</td>
+      <td id="hospital_new_history_2">Comprehensive (C)</td>
+      <td id="hospital_new_history_3">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">Examination</td>
+      <td id="hospital_new_exam_1">Detailed (D)</td>
+      <td id="hospital_new_exam_2">Comprehensive (C)</td>
+      <td id="hospital_new_exam_3">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">MDM Complexity</td>
+      <td id="hospital_new_mdm_1">Straight Forward</td>
+      <td id="hospital_new_mdm_2">Moderate</td>
+      <td id="hospital_new_mdm_3">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="hospital_new_overall_1">99221<br />Level I</th>
+      <th id="hospital_new_overall_2">99222<br />Level II</th>
+      <th id="hospital_new_overall_3">99223<br />Level III</th>
+    </tr>
+    </table>
+
+    <table id="overall_grid_hospital_sub" class="overall-table">
+    <tr><th colspan="5">Level of Service is based on the middle of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;">History</td>
+      <td id="hospital_sub_history_1">Problem Focused (PF)</td>
+      <td id="hospital_sub_history_2">Expanded (EPF)</td>
+      <td id="hospital_sub_history_3">Detailed (D)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">Examination</td>
+      <td id="hospital_sub_exam_1">Problem Focused (PF)</td>
+      <td id="hospital_sub_exam_2">Expanded (EPF)</td>
+      <td id="hospital_sub_exam_3">Detailed (D)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">MDM Complexity</td>
+      <td id="hospital_sub_mdm_1">Straight Forward</td>
+      <td id="hospital_sub_mdm_2">Moderate</td>
+      <td id="hospital_sub_mdm_3">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="hospital_sub_overall_1">99231<br />Level I</th>
+      <th id="hospital_sub_overall_2">99232<br />Level II</th>
+      <th id="hospital_sub_overall_3">99233<br />Level III</th>
+    </tr>
+    </table>
+
+    <table id="overall_grid_consult" class="overall-table">
+    <tr><td colspan="6">Level of Service is based on the lowest of the components.</td></tr>
+    <tr>
+      <td style="font-style:italic;">History</td>
+      <td id="consult_history_1">Problem Focused (PF)</td>
+      <td id="consult_history_2">Expanded (EPF)</td>
+      <td id="consult_history_3">Detailed (D)</td>
+      <td id="consult_history_4">Comprehensive (C)</td>
+      <td id="consult_history_5">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">Examination</td>
+      <td id="consult_exam_1">Problem Focused (PF)</td>
+      <td id="consult_exam_2">Expanded (EPF)</td>
+      <td id="consult_exam_3">Detailed (D)</td>
+      <td id="consult_exam_4">Comprehensive (C)</td>
+      <td id="consult_exam_5">Comprehensive (C)</td>
+    <tr>
+    </tr>
+      <td style="font-style:italic;">MDM Complexity</td>
+      <td id="consult_mdm_1">Straight Forward</td>
+      <td id="consult_mdm_2">Straight Forward</td>
+      <td id="consult_mdm_3">Low</td>
+      <td id="consult_mdm_4">Moderate</td>
+      <td id="consult_mdm_5">High</td>
+    </tr>
+    <tr style="background-color:#f3f1f5;">
+      <th>Level</th>
+      <th id="consult_overall_1">99241<br />Level I</th>
+      <th id="consult_overall_2">99242<br />Level II</th>
+      <th id="consult_overall_3">99243<br />Level III</th>
+      <th id="consult_overall_4">99244<br />Level IV</th>
+      <th id="consult_overall_5">99245<br />Level V</th>
+    </tr>
+    </table>
+
+    <br /><br />
+    <div style="margin:30px;border-radius:6px;font-size:14pt;padding:20px;background-color:#ddd;border:1px solid #ddd;">
+      Component-based Level of Service:&nbsp; <span id="component_code_display" style="font-weight:bold;font-size:1.2rem;">N/A</span>&nbsp; <span id="em_code_over_under2" style="display:none;border-radius:3px;"></span>
+    </div>
+  </td>
+</tr>
+
+</table>
+
+</div> <!-- calculatorDiv -->
+
+<div id="printCopyright" class="print" style="display:none;text-align:center;">
+  <p>Produced by the Find-A-Code E/M Calculator</p>
+</div>
+
+<div class="no-print">
+  <h3>Print</h3>
+  Title to print at the top
+  <input type="text" name="printTitle" id="printTitle" class="form-control" style="display:inline;margin-bottom:1rem;" />
+  Notes to print at the top
+  <textarea name="printNotes" id="printNotes" class="form-control" style="height:75px;margin-bottom:1rem;"></textarea>
+  <button type="button" class="btn btn-secondary" style="margin-right:1rem;" onclick="printChart();">print</button>
+  <button type="button" class="btn btn-secondary no-print" onclick="window.location.href='index.php';">calculator home page</button>
+</div>
+
+
+
+
+
+    </main>
+
+    </footer>
+
+
+
+
+</html>
